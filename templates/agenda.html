@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda Médica</title>
+
+    <link href="{{ url_for('static', filename='css/tabulator.min.css') }}" rel="stylesheet">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/tabulator.min.js') }}"></script>
+    <link href="{{ url_for('static', filename='css/agenda.css')}}" rel="stylesheet">
+    
+</head>
+<body>
+
+    <div class="cabecalho">
+        <h2>Agenda Médica</h2>
+        <div>
+            <span>Bem-vindo(a), <strong>{{ current_user.nome }}</strong>!</span> | 
+            <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alerta">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="campo-busca">
+        <input type="text" id="filtro-input" placeholder="Buscar por Paciente, CPF ou Médico">
+    </div>
+
+    <div id="tabela-agendamentos"></div>
+
+    <script>
+        
+        var dadosAgenda = {{ agendamentos_json | safe }};
+
+        var tabela = new Tabulator("#tabela-agendamentos", {
+            data: dadosAgenda,
+            layout: "fitColumns",
+            placeholder: "Nenhum agendamento encontrado.",
+            columns: [
+                {title: "Data", field: "data", width: 110},
+                {title: "Horário", field: "horario", width: 100},
+                {title: "Paciente", field: "paciente"},
+                {title: "CPF", field: "cpf"},
+                {title: "Médico", field: "medico"},
+                {title: "Especialidade", field: "especialidade"},
+                {title: "Convênio", field: "convenio"},
+                {title: "Status", field: "status", width: 120}
+            ]
+        });
+
+        
+        document.getElementById("filtro-input").addEventListener("keyup", function(e){
+            var termoBusca = e.target.value.toLowerCase();
+            tabela.setFilter(function(linha){
+                return (linha.paciente && linha.paciente.toLowerCase().includes(termoBusca)) ||
+                       (linha.cpf && linha.cpf.toLowerCase().includes(termoBusca)) ||
+                       (linha.medico && linha.medico.toLowerCase().includes(termoBusca));
+            });
+        });
+    </script>
+
+</body>
+</html>
