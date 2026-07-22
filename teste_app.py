@@ -6,7 +6,6 @@ class AgendaMedicaTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Configura o app para modo de teste com banco em memória ANTES de criar conexões
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         app.config['WTF_CSRF_ENABLED'] = False
@@ -15,12 +14,9 @@ class AgendaMedicaTestCase(unittest.TestCase):
         self.client = app.test_client()
         self.app_context = app.app_context()
         self.app_context.push()
-
-        # Garante que o banco em memória recomece do zero
         db.drop_all()
         db.create_all()
 
-        # Cria o usuário limpo para o teste atual
         usuario_teste = Usuario(
             nome="admin",
             email="admin@gmail.com",

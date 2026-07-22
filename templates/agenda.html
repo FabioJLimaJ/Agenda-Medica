@@ -2,39 +2,48 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Agenda Médica</title>
-
-    <link href="{{ url_for('static', filename='css/tabulator.min.css') }}" rel="stylesheet">
-    <script type="text/javascript" src="{{ url_for('static', filename='js/tabulator.min.js') }}"></script>
-    <link href="{{ url_for('static', filename='css/agenda.css')}}" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Médica - Consultas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabulator.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/agenda.css') }}">
 </head>
 <body>
 
-    <div class="cabecalho">
-        <h2>Agenda Médica</h2>
-        <div>
-            <span>Bem-vindo(a), <strong>{{ current_user.nome }}</strong>!</span> | 
-            <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
-        </div>
+    <div class="container">
+
+        <header class="cabecalho">
+            <div class="usuario-info">
+                <h1>Agenda Médica</h1>
+                <p>Consultas e Agendamentos</p>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn-sair">Sair da Conta</a>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alerta" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <section class="campo-busca">
+            <input 
+                type="text" 
+                id="filtro-input" 
+                placeholder="Pesquisar por paciente, CPF ou médico..." 
+                autocomplete="off">
+        </section>
+
+        <main>
+            <div id="tabela-agendamentos"></div>
+        </main>
     </div>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alerta">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <script src="{{ url_for('static', filename='js/tabulator.min.js') }}"></script>
 
-    <div class="campo-busca">
-        <input type="text" id="filtro-input" placeholder="Buscar por Paciente, CPF ou Médico">
-    </div>
-
-    <div id="tabela-agendamentos"></div>
 
     <script>
-        
         var dadosAgenda = {{ agendamentos_json | safe }};
 
         var tabela = new Tabulator("#tabela-agendamentos", {
@@ -53,7 +62,6 @@
             ]
         });
 
-        
         document.getElementById("filtro-input").addEventListener("keyup", function(e){
             var termoBusca = e.target.value.toLowerCase();
             tabela.setFilter(function(linha){
@@ -63,6 +71,5 @@
             });
         });
     </script>
-
 </body>
 </html>
